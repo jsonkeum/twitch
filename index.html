@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <title>Twitch.tv Stream Manager</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Fira+Sans+Extra+Condensed|Fjalla+One');
+        body {
+          background-color:black;
+        }
+        .jumbotron {
+          background-color:#660000;
+          margin-top:20px;
+        }
+        #title {
+          font-family:"Fjalla One";
+          color:#ffcc00;
+        }
+        #mainPanel {
+          background-color:#fffae6;
+        }
+        #menuList {
+          margin-top:20px;
+          font-family:"Fira Sans Extra Condensed";
+          color:#ffcc00;
+        }
+        #menuList > div {
+          cursor:pointer;
+        }
+        .active {
+          background-color:#fffae6;
+          color:#660000;
+          border-radius:10px;
+          cursor:default;
+        }
+        .picture img{
+          width:140px;
+          height:140px;
+          border-radius:70px;
+          border:5px solid #ffcc00;
+          margin-top:-30px;
+          box-shadow:3px 3px 5px grey;
+        }
+        .user {
+          font-family:"Fira Sans Extra Condensed";
+          text-align:left;
+        }
+        .status {
+          font-size:48px;
+        }
+        .fa-times-circle {
+          color:red;
+        }
+        .fa-check-circle {
+          color:green;
+        }
+        .card {
+          margin-bottom:60px;
+          text-align:center;
+        }
+        .streaming {
+          margin-top:-25px;
+          color:gray;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="jumbotron">
+    <h1 id="title" class="text-center">Your Twitch Streams</h1>
+    <div class="row">
+      <div class="col-md-2" id="menuBar">
+        <div class="row" id="menuList">
+          <div class="col-xs-4 col-sm-4 col-md-12 buttons"><h2 class="text-center">ALL</h2></div>
+          <div class="col-xs-4 col-sm-4 col-md-12 buttons"><h2 class="text-center">ONLINE</h2></div>
+          <div class="col-xs-4 col-sm-4 col-md-12 buttons"><h2 class="text-center">OFFLINE</h2></div>
+        </div>
+      </div>
+      <div class="col-md-10 jumbotron" id="mainPanel">
+      </div>
+    </div>
+    <p class="text-center" style="color:#ffcc00;margin-bottom:-20px;font-size:14px">Written by QuanchiFootball</p>
+  </div>
+</div>
+    
+<!-- 
+    Start of JS
+-->
+<script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+<script>
+var online, offline;
+var users = [{userName:"mightymouseufc125"}, {userName:"ESL_SC2"}, {userName:"OgamingSC2"}, {userName:"cretetion"}, {userName:"freecodecamp"}, {userName:"storbeck"}, {userName:"BeyondTheSummit"}, {userName:"RobotCaleb"}, {userName:"eclypsiatvlol"}]
+var urlCreate = function(query, value){
+  return "https://wind-bow.gomix.me/twitch-api/" + query + "/" + value + "?callback=?";
+}
+
+var getInfo = function(){
+  users.forEach(function(user){
+    $.getJSON(urlCreate("channels", user.userName)).done(function(data){
+      channelData(user, data);
+      $.getJSON(urlCreate("streams", user.userName)).done(function(data){
+        streamData(user, data);
+        if(online && user.isStreaming){
+          updateDash(user);
+        } else if(offline && !user.isStreaming) {
+          updateDash(user);
+        } else if(!online && !offline) {
+          updateDash(user);
+        }
+      });
+    });
+  });
+}
+
+var updateDash = function(user){
+    $("#mainPanel").append('<div class="row card"><div class ="col-xs-5 col-sm-3 col-md-3 picture"><a href=' + user.URL + ' target="_blank"><img src=' + user.image + ' alt="No Pic"></div><div class ="col-xs-6 col-sm-7 col-md-7 user"><h2 class="name">' + user.userName + '</h2></a><br><p class="streaming">' + user.game + '</p></div><div class ="col-xs-1 col-sm-2 col-md-2 status"><i class=' + (user.isStreaming ? '"fa fa-check-circle"' : '"fa fa-times-circle" disabled') + ' aria-hidden="true"></i></div></div>');
+    $("#mainPanel > div:last-child").hide().fadeIn(250);
+}
+
+var channelData = function(user, data){
+  if(data.logo != null){
+    user.image = data.logo;
+  } else {
+    user.image = "https://expertbeacon.com/sites/default/files/choose_a_doggy_daycare_with_a_well-trained_and_trustworthy_staff.jpg"
+  }
+  user.URL = data.url;
+}
+
+var streamData = function(user, data){
+  if(data.stream != null){
+    user.isStreaming = true;
+    user.game = data.stream.game;
+  } else {
+    user.isStreaming = false;
+    user.game = "";
+  }
+}
+
+$(document).ready(function(){
+  getInfo();
+  $("#menuList > div:first-child").addClass('active');
+  $(".buttons").click(function(){
+    if(!$(this).hasClass('active')){
+      $(".active").removeClass('active');
+      $(this).addClass('active');
+    if($(".active").text() == "ONLINE"){
+      online = true;
+      offline = false;
+    } else if($(".active").text() == "OFFLINE"){
+      online = false;
+      offline = true;
+    } else {
+      online = false;
+      offline = false;
+    }
+    $("#mainPanel").empty();
+    getInfo();
+    }
+  });
+});
+</script>
+</body>
+</html>
