@@ -4,71 +4,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
     <title>Twitch.tv Stream Manager</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css?family=Fira+Sans+Extra+Condensed|Fjalla+One');
-        body {
-          background-color:black;
-        }
-        .jumbotron {
-          background-color:#660000;
-          margin-top:20px;
-        }
-        #title {
-          font-family:"Fjalla One";
-          color:#ffcc00;
-        }
-        #mainPanel {
-          background-color:#fffae6;
-        }
-        #menuList {
-          margin-top:20px;
-          font-family:"Fira Sans Extra Condensed";
-          color:#ffcc00;
-        }
-        #menuList > div {
-          cursor:pointer;
-        }
-        .active {
-          background-color:#fffae6;
-          color:#660000;
-          border-radius:10px;
-          cursor:default;
-        }
-        .picture img{
-          width:140px;
-          height:140px;
-          border-radius:70px;
-          border:5px solid #ffcc00;
-          margin-top:-30px;
-          box-shadow:3px 3px 5px grey;
-        }
-        .user {
-          font-family:"Fira Sans Extra Condensed";
-          text-align:left;
-        }
-        .status {
-          font-size:48px;
-        }
-        .fa-times-circle {
-          color:red;
-        }
-        .fa-check-circle {
-          color:green;
-        }
-        .card {
-          margin-bottom:60px;
-          text-align:center;
-        }
-        .streaming {
-          margin-top:-25px;
-          color:gray;
-        }
-    </style>
 </head>
 <body>
-<div class="container-fluid">
-  <div class="jumbotron">
+<div id="wrapper" class="container">
     <h1 id="title" class="text-center">Your Twitch Streams</h1>
     <div class="row">
       <div class="col-md-2" id="menuBar">
@@ -80,9 +20,8 @@
       </div>
       <div class="col-md-10 jumbotron" id="mainPanel">
       </div>
+      <p class="text-center" style="color:#ffcc00;font-size:14px">Written by QuanchiFootball</p>
     </div>
-    <p class="text-center" style="color:#ffcc00;margin-bottom:-20px;font-size:14px">Written by QuanchiFootball</p>
-  </div>
 </div>
     
 <!-- 
@@ -115,7 +54,8 @@ var getInfo = function(){
 }
 
 var updateDash = function(user){
-    $("#mainPanel").append('<div class="row card"><div class ="col-xs-5 col-sm-3 col-md-3 picture"><a href=' + user.URL + ' target="_blank"><img src=' + user.image + ' alt="No Pic"></div><div class ="col-xs-6 col-sm-7 col-md-7 user"><h2 class="name">' + user.userName + '</h2></a><br><p class="streaming">' + user.game + '</p></div><div class ="col-xs-1 col-sm-2 col-md-2 status"><i class=' + (user.isStreaming ? '"fa fa-check-circle"' : '"fa fa-times-circle" disabled') + ' aria-hidden="true"></i></div></div>');
+    $("#mainPanel").append(
+        '<div class="row card"><div class ="col-xs-4 col-sm-3 col-md-3 picture"><a href=' + user.URL + ' target="_blank"><img src=' + user.image + ' alt="No Pic"></a></div><div class ="col-xs-8 col-sm-9 col-md-9 user"><div><h2 class="name"><a href=' + user.URL + ' target="_blank">' + user.userName + '</a></h2></div><div class="row"><div class="col-xs-9 col-sm-10 col-md-10"><p class="streaming">' + user.game + '</p></div><div class ="col-xs-3 col-sm-2 col-md-2 status"><span title=' + user.userName + " is " + (user.isStreaming ? "online" : "offline") + '><i class=' + (user.isStreaming ? '"fa fa-check-circle"' : '"fa fa-times-circle" disabled') + ' aria-hidden="true"></i></span></div></div></div></div>');
     $("#mainPanel > div:last-child").hide().fadeIn(250);
 }
 
